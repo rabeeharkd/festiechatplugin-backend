@@ -44,66 +44,46 @@ const addChats = async () => {
     // Create 4 Direct Message Chats
     const dmChats = [
       {
-        name: 'Alice & Bob',
+        name: 'Team Nexus',
         description: null,
         type: 'individual',
         participants: [
           { name: 'Alice', role: 'member' },
           { name: 'Bob', role: 'member' }
         ],
-        lastMessage: {
-          content: 'Hey Bob! Are you coming to the concert tonight?',
-          sender: 'Alice',
-          timestamp: new Date(Date.now() - 1800000) // 30 minutes ago
-        },
         lastActivity: new Date(Date.now() - 1800000),
         createdBy: new mongoose.Types.ObjectId()
       },
       {
-        name: 'Charlie & Diana',
+        name: 'Team Vertex',
         description: null,
         type: 'individual',
         participants: [
           { name: 'Charlie', role: 'member' },
           { name: 'Diana', role: 'member' }
         ],
-        lastMessage: {
-          content: 'Thanks for helping with the event setup!',
-          sender: 'Charlie',
-          timestamp: new Date(Date.now() - 3600000) // 1 hour ago
-        },
         lastActivity: new Date(Date.now() - 3600000),
         createdBy: new mongoose.Types.ObjectId()
       },
       {
-        name: 'Alice & Admin',
+        name: 'Team Equinox',
         description: null,
         type: 'individual',
         participants: [
           { name: 'Alice', role: 'member' },
           { name: 'Admin', role: 'member' }
         ],
-        lastMessage: {
-          content: 'Could you help me with the workshop registration?',
-          sender: 'Alice',
-          timestamp: new Date(Date.now() - 7200000) // 2 hours ago
-        },
         lastActivity: new Date(Date.now() - 7200000),
         createdBy: new mongoose.Types.ObjectId()
       },
       {
-        name: 'Bob & Charlie',
+        name: 'Team Axis',
         description: null,
         type: 'individual',
         participants: [
           { name: 'Bob', role: 'member' },
           { name: 'Charlie', role: 'member' }
         ],
-        lastMessage: {
-          content: 'Let\'s meet at the food court in 10 minutes',
-          sender: 'Bob',
-          timestamp: new Date(Date.now() - 600000) // 10 minutes ago
-        },
         lastActivity: new Date(Date.now() - 600000),
         createdBy: new mongoose.Types.ObjectId()
       }
@@ -116,42 +96,7 @@ const addChats = async () => {
       console.log(`✅ Created DM chat: ${dmChats[i].name}`);
     }
 
-    // Add some sample messages to the group chat
-    const groupMessages = [
-      new Message({
-        chat: groupChat._id,
-        sender: 'Admin',
-        content: 'Welcome everyone to the Festival Main Group! 🎪',
-        type: 'text'
-      }),
-      new Message({
-        chat: groupChat._id,
-        sender: 'Alice',
-        content: 'So excited for this festival! When does the music start?',
-        type: 'text'
-      }),
-      new Message({
-        chat: groupChat._id,
-        sender: 'Bob',
-        content: 'I think the first band starts at 2 PM on the main stage! 🎵',
-        type: 'text'
-      }),
-      new Message({
-        chat: groupChat._id,
-        sender: 'Diana',
-        content: 'Don\'t forget to check out the art workshops too!',
-        type: 'text'
-      }),
-      new Message({
-        chat: groupChat._id,
-        sender: 'Charlie',
-        content: 'Food trucks are amazing this year! 🍕🌮',
-        type: 'text'
-      })
-    ];
 
-    await Message.insertMany(groupMessages);
-    console.log('✅ Added sample messages to group chat');
 
     console.log('\n🎉 Successfully created:');
     console.log('📊 1 Group chat: Festival Main Group');
