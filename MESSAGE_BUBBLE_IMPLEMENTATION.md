@@ -127,7 +127,7 @@ const ChatContainer = ({ chatId }) => {
   // Initialize socket connection
   useEffect(() => {
     if (user && token) {
-      socketRef.current = io('https://festiechatplugin-backend.onrender.com', {
+      socketRef.current = io('https://https://festiechatplugin-backend-8g96.onrender.com', {
         auth: { token }
       });
 
@@ -159,7 +159,7 @@ const ChatContainer = ({ chatId }) => {
     const loadMessages = async () => {
       try {
         const response = await fetch(
-          `https://festiechatplugin-backend.onrender.com/api/messages/${chatId}`,
+          `https://https://festiechatplugin-backend-8g96.onrender.com/api/messages/${chatId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -194,7 +194,7 @@ const ChatContainer = ({ chatId }) => {
     try {
       // Send via REST API
       const response = await fetch(
-        `https://festiechatplugin-backend.onrender.com/api/messages/${chatId}`,
+        `https://https://festiechatplugin-backend-8g96.onrender.com/api/messages/${chatId}`,
         {
           method: 'POST',
           headers: {
@@ -419,7 +419,7 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           const response = await fetch(
-            'https://festiechatplugin-backend.onrender.com/api/auth/verify',
+            'https://https://festiechatplugin-backend-8g96.onrender.com/api/auth/verify',
             {
               headers: {
                 'Authorization': `Bearer ${token}`,
@@ -454,7 +454,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await fetch(
-        'https://festiechatplugin-backend.onrender.com/api/auth/login',
+        'https://https://festiechatplugin-backend-8g96.onrender.com/api/auth/login',
         {
           method: 'POST',
           headers: {

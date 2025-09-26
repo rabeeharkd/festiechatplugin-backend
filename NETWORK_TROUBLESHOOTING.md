@@ -3,14 +3,14 @@
 ## 🔍 **Diagnostic Steps for "Network error. Please check your connection."**
 
 ### **1. Verify Backend Deployment**
-✅ **Backend Status**: Working (https://festiechatplugin-backend.onrender.com/health)
-✅ **Auth Service**: Working (https://festiechatplugin-backend.onrender.com/api/auth/health)
+✅ **Backend Status**: Working (https://https://festiechatplugin-backend-8g96.onrender.com/health)
+✅ **Auth Service**: Working (https://https://festiechatplugin-backend-8g96.onrender.com/api/auth/health)
 
 ### **2. Test Frontend Connection**
 Test this endpoint from your frontend:
 ```javascript
 // Test connection endpoint
-POST https://festiechatplugin-backend.onrender.com/api/test-connection
+POST https://https://festiechatplugin-backend-8g96.onrender.com/api/test-connection
 Content-Type: application/json
 
 {
@@ -28,7 +28,7 @@ Content-Type: application/json
 #### **B. Frontend URL Mismatch**
 Make sure your frontend is making requests to:
 ```
-https://festiechatplugin-backend.onrender.com/api/auth/register
+https://https://festiechatplugin-backend-8g96.onrender.com/api/auth/register
 ```
 NOT:
 ```
@@ -38,7 +38,7 @@ http://localhost:5000/api/auth/register
 #### **C. Request Format Issues**
 Ensure your frontend sends:
 ```javascript
-fetch('https://festiechatplugin-backend.onrender.com/api/auth/register', {
+fetch('https://https://festiechatplugin-backend-8g96.onrender.com/api/auth/register', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ fetch('https://festiechatplugin-backend.onrender.com/api/auth/register', {
 #### **Step 1: Test Basic Connectivity**
 ```javascript
 // Add this to your frontend to test
-fetch('https://festiechatplugin-backend.onrender.com/health')
+fetch('https://https://festiechatplugin-backend-8g96.onrender.com/health')
   .then(response => response.json())
   .then(data => console.log('Backend accessible:', data))
   .catch(error => console.error('Backend not accessible:', error));
@@ -65,7 +65,7 @@ fetch('https://festiechatplugin-backend.onrender.com/health')
 
 #### **Step 2: Test Auth Service**
 ```javascript
-fetch('https://festiechatplugin-backend.onrender.com/api/auth/health')
+fetch('https://https://festiechatplugin-backend-8g96.onrender.com/api/auth/health')
   .then(response => response.json())
   .then(data => console.log('Auth service accessible:', data))
   .catch(error => console.error('Auth service not accessible:', error));
@@ -73,7 +73,7 @@ fetch('https://festiechatplugin-backend.onrender.com/api/auth/health')
 
 #### **Step 3: Test Connection Endpoint**
 ```javascript
-fetch('https://festiechatplugin-backend.onrender.com/api/test-connection', {
+fetch('https://https://festiechatplugin-backend-8g96.onrender.com/api/test-connection', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   credentials: 'include',
@@ -86,7 +86,7 @@ fetch('https://festiechatplugin-backend.onrender.com/api/test-connection', {
 
 #### **Step 4: Test Registration**
 ```javascript
-fetch('https://festiechatplugin-backend.onrender.com/api/auth/register', {
+fetch('https://https://festiechatplugin-backend-8g96.onrender.com/api/auth/register', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   credentials: 'include',
@@ -125,7 +125,7 @@ Open your browser's Developer Tools (F12) and check:
 
 ### **7. Quick Fix Checklist**
 
-- [ ] Backend URL is `https://festiechatplugin-backend.onrender.com`
+- [ ] Backend URL is `https://https://festiechatplugin-backend-8g96.onrender.com`
 - [ ] Request includes `Content-Type: application/json`
 - [ ] Request includes `credentials: 'include'`
 - [ ] No localhost URLs in production frontend
@@ -136,7 +136,7 @@ Open your browser's Developer Tools (F12) and check:
 
 ```bash
 # Test with curl
-curl -X POST "https://festiechatplugin-backend.onrender.com/api/auth/register" \
+curl -X POST "https://https://festiechatplugin-backend-8g96.onrender.com/api/auth/register" \
   -H "Content-Type: application/json" \
   -H "Origin: https://fms-chat.vercel.app" \
   -d '{"name":"Test User","email":"test@example.com","password":"password123"}'
