@@ -1,6 +1,6 @@
-import express from 'express';
-import { body, validationResult } from 'express-validator';
-import {
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const {
   changePassword,
   getMe,
   login,
@@ -9,13 +9,13 @@ import {
   refreshToken,
   register,
   updateProfile
-} from '../controllers/authController.js';
-import {
+} = require('../controllers/authController.js');
+const {
   authorize,
   protect,
   validateRefreshToken
-} from '../middleware/authMiddleware.js';
-import User from '../models/User.js';
+} = require('../middleware/authMiddleware.js');
+const User = require('../models/User.js');
 
 const router = express.Router();
 
@@ -350,4 +350,4 @@ router.get('/health', (req, res) => {
   });
 });
 
-export default router;
+module.exports = router;
