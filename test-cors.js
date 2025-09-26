@@ -5,7 +5,7 @@ async function testCORS() {
   
   const backendURLs = [
     'https://festiechatplugin-backend-8g96.onrender.com',
-    'https://https://festiechatplugin-backend-8g96.onrender.com'
+    'https://festiechatplugin-backend-8g96.onrender.com'
   ];
   
   for (const url of backendURLs) {

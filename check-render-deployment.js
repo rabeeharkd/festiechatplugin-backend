@@ -3,7 +3,7 @@ const axios = require('axios');
 async function checkRenderDeployment() {
   console.log('🔍 Checking Render deployment status...\n');
   
-  const renderURL = 'https://https://festiechatplugin-backend-8g96.onrender.com';
+  const renderURL = 'https://festiechatplugin-backend-8g96.onrender.com';
   
   try {
     // Test health endpoint

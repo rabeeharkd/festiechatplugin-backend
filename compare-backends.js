@@ -6,7 +6,7 @@ async function compareBackendURLs() {
   const urls = [
     {
       name: 'Current Frontend URL (WRONG)',
-      url: 'https://https://festiechatplugin-backend-8g96.onrender.com',
+      url: 'https://festiechatplugin-backend.onrender.com',
       status: '❌'
     },
     {
