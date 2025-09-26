@@ -13,14 +13,22 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: [
-    'https://fmsplugin.vercel.app',     // ✅ Current frontend domain
-    'https://fms-chat.vercel.app',      // ❌ OLD domain - remove after testing
-    'http://localhost:3000',
-    'http://localhost:5173', 
-    'http://localhost:5174',
-    'http://localhost:5176'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    const allowedOrigins = [
+      'https://fmsplugin.vercel.app',
+      'https://fms-chat.vercel.app',
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://localhost:5174'
+    ];
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
