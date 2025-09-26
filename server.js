@@ -11,28 +11,34 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-// Middleware
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    const allowedOrigins = [
-      'https://fmsplugin.vercel.app',
-      'https://fms-chat.vercel.app',
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'http://localhost:5174'
-    ];
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Middleware - Enhanced CORS with explicit header setting
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'https://fmsplugin.vercel.app',
+    'https://fms-chat.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:5174'
+  ];
+  
+  // Set CORS headers explicitly
+  if (allowedOrigins.includes(origin) || !origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  }
+  
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
+  
+  // Handle preflight OPTIONS requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  next();
+});
 app.use(express.json());
 
 // MongoDB connection
@@ -52,15 +58,17 @@ app.get("/", (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
-    message: "FestieChat Backend is running - Enhanced Chat System v2.1",
+    message: "FestieChat Backend - CORS EXPLICITLY FIXED v2.2",
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
     environment: process.env.NODE_ENV || 'development',
-    version: "2.1.0",
-    features: ["Enhanced Chat System", "JWT Authentication", "CORS Fixed for fmsplugin.vercel.app"],
+    version: "2.2.0",
+    features: ["Enhanced Chat System", "JWT Authentication", "EXPLICIT CORS Headers Set"],
     cors: {
       allowedOrigins: ['https://fmsplugin.vercel.app', 'https://fms-chat.vercel.app'],
-      status: 'Active'
+      status: 'EXPLICIT_HEADERS_SET',
+      origin: req.headers.origin || 'no-origin',
+      method: 'Custom middleware with setHeader()'
     }
   });
 });
