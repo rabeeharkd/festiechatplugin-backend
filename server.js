@@ -13,8 +13,17 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://fmsplugin.vercel.app', 'https://fms-chat.vercel.app', 'http://localhost:5176', 'http://localhost:5174', 'http://localhost:3000', 'http://localhost:5173'],
-  credentials: true
+  origin: [
+    'https://fmsplugin.vercel.app',     // ✅ Current frontend domain
+    'https://fms-chat.vercel.app',      // ❌ OLD domain - remove after testing
+    'http://localhost:3000',
+    'http://localhost:5173', 
+    'http://localhost:5174',
+    'http://localhost:5176'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
