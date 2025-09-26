@@ -52,12 +52,16 @@ app.get("/", (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
-    message: "FestieChat Backend is running - Enhanced Chat System v2.0",
+    message: "FestieChat Backend is running - Enhanced Chat System v2.1",
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
     environment: process.env.NODE_ENV || 'development',
-    version: "2.0.0",
-    features: ["Enhanced Chat System", "JWT Authentication", "CORS Configured"]
+    version: "2.1.0",
+    features: ["Enhanced Chat System", "JWT Authentication", "CORS Fixed for fmsplugin.vercel.app"],
+    cors: {
+      allowedOrigins: ['https://fmsplugin.vercel.app', 'https://fms-chat.vercel.app'],
+      status: 'Active'
+    }
   });
 });
 
