@@ -46,6 +46,10 @@ export const sendMessage = async (req, res) => {
     // Update chat's last message
     chat.lastMessage = newMessage._id;
     chat.updatedAt = new Date();
+    // Ensure createdBy is set (for legacy chats)
+    if (!chat.createdBy) {
+      chat.createdBy = userId;
+    }
     await chat.save();
 
     // Populate sender info for response

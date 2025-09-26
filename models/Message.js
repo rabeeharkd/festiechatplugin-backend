@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
 const messageSchema = new mongoose.Schema({
   chat: {
@@ -210,4 +210,4 @@ messageSchema.methods.softDelete = function(deletedBy) {
   return this.save()
 }
 
-export default mongoose.model('Message', messageSchema)
+module.exports = mongoose.model('Message', messageSchema)

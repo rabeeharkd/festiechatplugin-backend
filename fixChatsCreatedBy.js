@@ -1,17 +1,16 @@
+
 // Script to fix missing 'createdBy' field in Chat documents
 // Usage: node fixChatsCreatedBy.js
 
-import mongoose from 'mongoose';
-import Chat from './models/Chat.js';
-import User from './models/User.js';
-import dotenv from 'dotenv';
+require('dotenv').config();
+const mongoose = require('mongoose');
+const Chat = require('./models/Chat.js');
+const User = require('./models/User.js');
 
-dotenv.config();
-
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/festiechat';
+const MONGO_URI = 'mongodb://localhost:27017/festiechat';
 
 async function fixChats() {
-  await mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+  await mongoose.connect(MONGO_URI);
   console.log('Connected to MongoDB');
 
   const chats = await Chat.find({ createdBy: { $exists: false } });
