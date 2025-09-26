@@ -1,8 +1,8 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+const jwt = require('jsonwebtoken');
+const User = require('../models/User.js');
 
 // @desc    Protect routes - verify JWT token
-export const protect = async (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
     let token;
 
@@ -83,7 +83,7 @@ export const protect = async (req, res, next) => {
 };
 
 // @desc    Grant access to specific roles
-export const authorize = (...roles) => {
+const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({
@@ -104,7 +104,7 @@ export const authorize = (...roles) => {
 };
 
 // @desc    Optional auth - attach user if token is valid, but don't require it
-export const optionalAuth = async (req, res, next) => {
+const optionalAuth = async (req, res, next) => {
   try {
     let token;
 
@@ -152,7 +152,7 @@ export const optionalAuth = async (req, res, next) => {
 // @desc    Rate limiting middleware for auth endpoints
 
 // @desc    Middleware to extract and validate refresh token
-export const validateRefreshToken = async (req, res, next) => {
+const validateRefreshToken = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
 
@@ -184,7 +184,7 @@ export const validateRefreshToken = async (req, res, next) => {
 };
 
 // @desc    Middleware to check if user owns resource or is admin
-export const checkResourceOwnership = (resourceIdField = 'id') => {
+const checkResourceOwnership = (resourceIdField = 'id') => {
   return async (req, res, next) => {
     try {
       const resourceId = req.params[resourceIdField];
@@ -221,7 +221,7 @@ export const checkResourceOwnership = (resourceIdField = 'id') => {
   };
 };
 
-export default {
+module.exports = {
   protect,
   authorize,
   optionalAuth,

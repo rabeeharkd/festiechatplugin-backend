@@ -13,7 +13,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'https://fms-chat.vercel.app',
+  origin: ['https://fms-chat.vercel.app', 'http://localhost:5176', 'http://localhost:5174', 'http://localhost:3000', 'http://localhost:5173'],
   credentials: true
 }));
 app.use(express.json());
@@ -31,10 +31,25 @@ app.get("/", (req, res) => {
   res.send("🚀 FestieChat Backend Running...");
 });
 
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({
+    success: true,
+    message: "FestieChat Backend is running",
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 app.use("/api/chats", chatRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/auth", authRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 API available at: http://localhost:${PORT}/api`);
+  console.log(`🔗 Health check: http://localhost:${PORT}/`);
+});

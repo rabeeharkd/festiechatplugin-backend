@@ -1,6 +1,6 @@
-import User from '../models/User.js';
-import jwt from 'jsonwebtoken';
-import { validationResult } from 'express-validator';
+const User = require('../models/User.js');
+const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 
 // Helper function to handle validation errors
 const handleValidationErrors = (req, res) => {
@@ -25,7 +25,7 @@ const getDeviceInfo = (req) => {
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
-export const register = async (req, res) => {
+const register = async (req, res) => {
   try {
     // Check for validation errors
     const validationError = handleValidationErrors(req, res);
@@ -94,7 +94,7 @@ export const register = async (req, res) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-export const login = async (req, res) => {
+const login = async (req, res) => {
   try {
     // Check for validation errors
     const validationError = handleValidationErrors(req, res);
@@ -165,7 +165,7 @@ export const login = async (req, res) => {
 // @desc    Refresh access token
 // @route   POST /api/auth/refresh-token
 // @access  Public
-export const refreshToken = async (req, res) => {
+const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
 
@@ -216,7 +216,7 @@ export const refreshToken = async (req, res) => {
 // @desc    Logout user (single device)
 // @route   POST /api/auth/logout
 // @access  Private
-export const logout = async (req, res) => {
+const logout = async (req, res) => {
   try {
     const { refreshToken } = req.body;
     const user = req.user; // From auth middleware
@@ -246,7 +246,7 @@ export const logout = async (req, res) => {
 // @desc    Logout from all devices
 // @route   POST /api/auth/logout-all
 // @access  Private
-export const logoutAll = async (req, res) => {
+const logoutAll = async (req, res) => {
   try {
     const user = req.user; // From auth middleware
 
@@ -270,7 +270,7 @@ export const logoutAll = async (req, res) => {
 // @desc    Get current user profile
 // @route   GET /api/auth/me
 // @access  Private
-export const getMe = async (req, res) => {
+const getMe = async (req, res) => {
   try {
     const user = req.user; // From auth middleware
 
@@ -300,7 +300,7 @@ export const getMe = async (req, res) => {
 // @desc    Update user profile
 // @route   PUT /api/auth/me
 // @access  Private
-export const updateProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
     // Check for validation errors
     const validationError = handleValidationErrors(req, res);
@@ -348,7 +348,7 @@ export const updateProfile = async (req, res) => {
 // @desc    Change password
 // @route   PUT /api/auth/change-password
 // @access  Private
-export const changePassword = async (req, res) => {
+const changePassword = async (req, res) => {
   try {
     // Check for validation errors
     const validationError = handleValidationErrors(req, res);
@@ -394,4 +394,15 @@ export const changePassword = async (req, res) => {
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
+};
+
+module.exports = {
+  register,
+  login,
+  refreshToken,
+  logout,
+  logoutAll,
+  getMe,
+  updateProfile,
+  changePassword
 };

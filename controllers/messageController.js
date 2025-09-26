@@ -1,11 +1,11 @@
-import Message from '../models/Message.js';
-import Chat from '../models/Chat.js';
-import User from '../models/User.js';
+const Message = require('../models/Message.js');
+const Chat = require('../models/Chat.js');
+const User = require('../models/User.js');
 
 // @desc    Send message with admin DM support
 // @route   POST /api/messages/:chatId
 // @access  Private
-export const sendMessage = async (req, res) => {
+const sendMessage = async (req, res) => {
   try {
     const { chatId } = req.params;
     const { content, messageType, sender } = req.body;
@@ -74,7 +74,7 @@ export const sendMessage = async (req, res) => {
 // @desc    Get messages with DM privacy filtering
 // @route   GET /api/messages/:chatId
 // @access  Private
-export const getMessages = async (req, res) => {
+const getMessages = async (req, res) => {
   try {
     const { chatId } = req.params;
     const userId = req.user.id;
@@ -143,7 +143,7 @@ export const getMessages = async (req, res) => {
 // @desc    Get single message
 // @route   GET /api/messages/message/:id
 // @access  Private
-export const getMessage = async (req, res) => {
+const getMessage = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -210,7 +210,7 @@ export const getMessage = async (req, res) => {
 // @desc    Update message
 // @route   PUT /api/messages/message/:id
 // @access  Private
-export const updateMessage = async (req, res) => {
+const updateMessage = async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
@@ -262,7 +262,7 @@ export const updateMessage = async (req, res) => {
 // @desc    Delete message
 // @route   DELETE /api/messages/message/:id
 // @access  Private
-export const deleteMessage = async (req, res) => {
+const deleteMessage = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -307,7 +307,7 @@ export const deleteMessage = async (req, res) => {
 // @desc    Mark messages as read
 // @route   PUT /api/messages/:chatId/read
 // @access  Private
-export const markMessagesAsRead = async (req, res) => {
+const markMessagesAsRead = async (req, res) => {
   try {
     const { chatId } = req.params;
     const userId = req.user.id;
@@ -362,7 +362,7 @@ export const markMessagesAsRead = async (req, res) => {
 // @desc    Search messages in chat
 // @route   GET /api/messages/:chatId/search
 // @access  Private
-export const searchMessages = async (req, res) => {
+const searchMessages = async (req, res) => {
   try {
     const { chatId } = req.params;
     const { q, limit = 20 } = req.query;
@@ -429,4 +429,14 @@ export const searchMessages = async (req, res) => {
       error: error.message
     });
   }
+};
+
+module.exports = {
+  sendMessage,
+  getMessages,
+  getMessage,
+  updateMessage,
+  deleteMessage,
+  markMessagesAsRead,
+  searchMessages
 };

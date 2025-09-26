@@ -1,11 +1,11 @@
-import Chat from '../models/Chat.js';
-import User from '../models/User.js';
-import Message from '../models/Message.js';
+const Chat = require('../models/Chat.js');
+const User = require('../models/User.js');
+const Message = require('../models/Message.js');
 
 // @desc    Create new chat (including admin DMs)
 // @route   POST /api/chats
 // @access  Private
-export const createChat = async (req, res) => {
+const createChat = async (req, res) => {
   try {
     const { name, type, participants, isAdminDM, description } = req.body;
     const userId = req.user.id;
@@ -67,7 +67,7 @@ export const createChat = async (req, res) => {
 // @desc    Get user's chats with role-based filtering
 // @route   GET /api/chats
 // @access  Private
-export const getChats = async (req, res) => {
+const getChats = async (req, res) => {
   try {
     const userId = req.user.id;
     const userRole = req.user.role;
@@ -118,7 +118,7 @@ export const getChats = async (req, res) => {
 // @desc    Get single chat
 // @route   GET /api/chats/:id
 // @access  Private
-export const getChat = async (req, res) => {
+const getChat = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -165,7 +165,7 @@ export const getChat = async (req, res) => {
 // @desc    Update chat
 // @route   PUT /api/chats/:id
 // @access  Private
-export const updateChat = async (req, res) => {
+const updateChat = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, type } = req.body;
@@ -218,7 +218,7 @@ export const updateChat = async (req, res) => {
 // @desc    Delete chat
 // @route   DELETE /api/chats/:id
 // @access  Private
-export const deleteChat = async (req, res) => {
+const deleteChat = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -267,7 +267,7 @@ export const deleteChat = async (req, res) => {
 // @desc    Add participant to chat
 // @route   POST /api/chats/:id/participants
 // @access  Private
-export const addParticipant = async (req, res) => {
+const addParticipant = async (req, res) => {
   try {
     const { id } = req.params;
     const { userId: participantId } = req.body;
@@ -324,7 +324,7 @@ export const addParticipant = async (req, res) => {
 // @desc    Remove participant from chat
 // @route   DELETE /api/chats/:id/participants/:participantId
 // @access  Private
-export const removeParticipant = async (req, res) => {
+const removeParticipant = async (req, res) => {
   try {
     const { id, participantId } = req.params;
     const userId = req.user.id;
@@ -368,4 +368,14 @@ export const removeParticipant = async (req, res) => {
       error: error.message
     });
   }
+};
+
+module.exports = {
+  createChat,
+  getChats,
+  getChat,
+  updateChat,
+  deleteChat,
+  addParticipant,
+  removeParticipant
 };
