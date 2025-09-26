@@ -1,17 +1,17 @@
-import express from 'express';
-import Message from '../models/Message.js';
-import Chat from '../models/Chat.js';
-import User from '../models/User.js';
-import { protect } from '../middleware/authMiddleware.js';
-import {
-  sendMessage as sendAdminMessage,
-  getMessages as getAdminMessages,
-  getMessage as getAdminMessage,
-  updateMessage as updateAdminMessage,
-  deleteMessage as deleteAdminMessage,
+const express = require('express');
+const Message = require('../models/Message.js');
+const Chat = require('../models/Chat.js');
+const User = require('../models/User.js');
+const { protect } = require('../middleware/authMiddleware.js');
+const {
+  sendMessage,
+  getMessages,
+  getMessage,
+  updateMessage,
+  deleteMessage,
   markMessagesAsRead,
   searchMessages
-} from '../controllers/messageController.js';
+} = require('../controllers/messageController.js');
 
 const router = express.Router();
 
@@ -244,12 +244,12 @@ router.delete('/:messageId', async (req, res) => {
 });
 
 // Admin DM routes (authenticated)
-router.post('/admin/:chatId', protect, sendAdminMessage);
-router.get('/admin/:chatId', protect, getAdminMessages);
-router.get('/admin/message/:id', protect, getAdminMessage);
-router.put('/admin/message/:id', protect, updateAdminMessage);
-router.delete('/admin/message/:id', protect, deleteAdminMessage);
+router.post('/admin/:chatId', protect, sendMessage);
+router.get('/admin/:chatId', protect, getMessages);
+router.get('/admin/message/:id', protect, getMessage);
+router.put('/admin/message/:id', protect, updateMessage);
+router.delete('/admin/message/:id', protect, deleteMessage);
 router.put('/admin/:chatId/read', protect, markMessagesAsRead);
 router.get('/admin/:chatId/search', protect, searchMessages);
 
-export default router;
+module.exports = router;
