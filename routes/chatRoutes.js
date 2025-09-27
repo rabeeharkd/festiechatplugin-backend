@@ -498,7 +498,10 @@ router.get("/search-by-name", protect, async (req, res) => {
 
     // Add join status for each chat
     const resultsWithJoinStatus = searchResults.map(chat => {
-      const isParticipant = chat.isParticipant(userId);
+      // Check if user is in participants array (convert ObjectIds to strings for comparison)
+      const isParticipant = chat.participants && chat.participants.some(
+        participant => participant.toString() === userId.toString()
+      );
       const participantCount = chat.participants ? chat.participants.length : 0;
 
       return {
