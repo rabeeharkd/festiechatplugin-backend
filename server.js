@@ -52,7 +52,10 @@ app.get("/", (req, res) => {
   res.json({ 
     message: "CORS is working 🎉", 
     backend: "FestieChat Backend", 
-    status: "Running" 
+    status: "Running",
+    version: "4.0.0 - Open Access Deployed",
+    timestamp: new Date().toISOString(),
+    features: ["Open Access Policy Active", "Join by Name", "Admin Plus Button"]
   });
 });
 
