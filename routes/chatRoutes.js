@@ -182,10 +182,10 @@ router.get("/:id", protect, async (req, res) => {
       });
     }
 
-    // All logged-in users can access any chat
+    // All logged-in users can access any chat - Open Access Policy v2
     res.status(200).json({
       success: true,
-      message: 'Chat accessible to all logged-in users',
+      message: 'Chat accessible to all logged-in users - Open Access Policy Active',
       data: chat
     });
 
