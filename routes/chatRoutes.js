@@ -118,7 +118,11 @@ router.post("/", protect, chatValidation, handleValidationErrors, async (req, re
       // Check if admin DM already exists for this user
       const existingAdminDM = await Chat.findOne({
         isAdminDM: true,
-        'participants.user': { $all: [userId, adminUser._id], $size: 2 },
+        type: 'dm',
+        $and: [
+          { 'participants.user': userId },
+          { 'participants.user': adminUser._id }
+        ],
         isActive: true
       });
       
