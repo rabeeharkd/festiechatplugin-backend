@@ -343,7 +343,7 @@ router.post("/:id/participants", protect, async (req, res) => {
 });
 
 // @route   POST /api/chats/:id/join
-// @desc    Allow user to join an existing chat (self-join)
+// @desc    Allow user to join an existing chat by ID (self-join)
 // @access  Private
 router.post("/:id/join", protect, async (req, res) => {
   try {
@@ -390,6 +390,144 @@ router.post("/:id/join", protect, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to join chat',
+      error: error.message
+    });
+  }
+});
+
+// @route   POST /api/chats/join-by-name
+// @desc    Allow user to join an existing chat by name (user-friendly)
+// @access  Private
+router.post("/join-by-name", protect, async (req, res) => {
+  try {
+    const { chatName } = req.body;
+    const userId = req.user._id;
+    const userName = req.user.name;
+
+    if (!chatName || typeof chatName !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Chat name is required'
+      });
+    }
+
+    // Find chat by name (case-insensitive)
+    const chat = await Chat.findOne({
+      name: { $regex: new RegExp(`^${chatName.trim()}$`, 'i') },
+      isActive: true
+    });
+
+    if (!chat) {
+      // Also search for partial matches to help users
+      const similarChats = await Chat.find({
+        name: { $regex: new RegExp(chatName.trim(), 'i') },
+        isActive: true
+      }).select('name _id').limit(5);
+
+      const suggestions = similarChats.length > 0 
+        ? similarChats.map(c => c.name)
+        : [];
+
+      return res.status(404).json({
+        success: false,
+        message: `Chat "${chatName}" not found`,
+        suggestions: suggestions.length > 0 ? suggestions : undefined,
+        hint: 'Chat names are case-sensitive. Try checking the exact spelling.'
+      });
+    }
+
+    // Check if user is already a participant
+    if (chat.isParticipant(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: `You are already a member of "${chat.name}"`,
+        data: chat
+      });
+    }
+
+    // Add current user as participant
+    chat.addParticipant(userId, userName, 'member');
+    await chat.save();
+    
+    // Populate the response
+    await chat.populate([
+      { path: 'participants.user', select: 'name email role' },
+      { path: 'createdBy', select: 'name email role' }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully joined "${chat.name}"!`,
+      data: chat
+    });
+
+  } catch (error) {
+    console.error('Error joining chat by name:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to join chat',
+      error: error.message
+    });
+  }
+});
+
+// @route   GET /api/chats/search-by-name
+// @desc    Search for chats by name (to help users find chats to join)
+// @access  Private
+router.get("/search-by-name", protect, async (req, res) => {
+  try {
+    const { q = '', limit = 10 } = req.query;
+    const userId = req.user._id;
+
+    if (!q || q.trim().length < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Search query is required (minimum 1 character)'
+      });
+    }
+
+    // Search for chats by name (case-insensitive, partial match)
+    const searchResults = await Chat.find({
+      name: { $regex: new RegExp(q.trim(), 'i') },
+      isActive: true
+    })
+    .select('name description type category participants createdBy createdAt')
+    .populate('createdBy', 'name email')
+    .limit(parseInt(limit))
+    .sort({ name: 1 });
+
+    // Add join status for each chat
+    const resultsWithJoinStatus = searchResults.map(chat => {
+      const isParticipant = chat.isParticipant(userId);
+      const participantCount = chat.participants ? chat.participants.length : 0;
+
+      return {
+        _id: chat._id,
+        name: chat.name,
+        description: chat.description,
+        type: chat.type,
+        category: chat.category,
+        createdBy: chat.createdBy,
+        createdAt: chat.createdAt,
+        participantCount: participantCount,
+        isParticipant: isParticipant,
+        canJoin: !isParticipant
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Found ${resultsWithJoinStatus.length} chats matching "${q}"`,
+      query: q,
+      count: resultsWithJoinStatus.length,
+      data: resultsWithJoinStatus
+    });
+
+  } catch (error) {
+    console.error('Error searching chats:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to search chats',
       error: error.message
     });
   }
