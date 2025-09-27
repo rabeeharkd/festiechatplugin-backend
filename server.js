@@ -11,9 +11,20 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-// Middleware - Enhanced CORS with explicit header setting
+// AGGRESSIVE CORS FIX - Set headers for ALL requests
 app.use((req, res, next) => {
   const origin = req.headers.origin;
+  
+  console.log(`🌐 CORS Request - Method: ${req.method}, Origin: ${origin}, URL: ${req.url}`);
+  
+  // ALWAYS set CORS headers for fmsplugin.vercel.app
+  res.setHeader('Access-Control-Allow-Origin', 'https://fmsplugin.vercel.app');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS,HEAD');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin,Content-Type,Authorization,X-Requested-With,Accept');
+  res.setHeader('Access-Control-Max-Age', '3600');
+  
+  // Also allow other origins if needed
   const allowedOrigins = [
     'https://fmsplugin.vercel.app',
     'https://fms-chat.vercel.app',
@@ -22,21 +33,18 @@ app.use((req, res, next) => {
     'http://localhost:5174'
   ];
   
-  // Set CORS headers explicitly
-  if (allowedOrigins.includes(origin) || !origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
   }
   
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
-  
-  // Handle preflight OPTIONS requests
+  // Handle preflight OPTIONS requests immediately
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
+    console.log('✅ Handling OPTIONS preflight request');
+    res.status(204).end();
     return;
   }
   
+  console.log('✅ CORS headers set, continuing to route...');
   next();
 });
 app.use(express.json());
@@ -56,19 +64,27 @@ app.get("/", (req, res) => {
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
+  console.log('🏥 Health check called - Origin:', req.headers.origin);
+  
   res.json({
     success: true,
-    message: "FestieChat Backend - CORS EXPLICITLY FIXED v2.2",
+    message: "FestieChat Backend - AGGRESSIVE CORS FIX v2.3",
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
     environment: process.env.NODE_ENV || 'development',
-    version: "2.2.0",
-    features: ["Enhanced Chat System", "JWT Authentication", "EXPLICIT CORS Headers Set"],
+    version: "2.3.0",
+    features: ["Enhanced Chat System", "JWT Authentication", "AGGRESSIVE CORS Fix"],
     cors: {
-      allowedOrigins: ['https://fmsplugin.vercel.app', 'https://fms-chat.vercel.app'],
-      status: 'EXPLICIT_HEADERS_SET',
-      origin: req.headers.origin || 'no-origin',
-      method: 'Custom middleware with setHeader()'
+      primaryOrigin: 'https://fmsplugin.vercel.app',
+      requestOrigin: req.headers.origin || 'no-origin',
+      status: 'AGGRESSIVE_ALWAYS_ALLOW',
+      method: 'Always set Access-Control-Allow-Origin',
+      headersSet: [
+        'Access-Control-Allow-Origin',
+        'Access-Control-Allow-Credentials', 
+        'Access-Control-Allow-Methods',
+        'Access-Control-Allow-Headers'
+      ]
     }
   });
 });
