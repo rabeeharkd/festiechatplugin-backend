@@ -342,4 +342,108 @@ router.post("/:id/participants", protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/chats/:id/join
+// @desc    Allow user to join an existing chat (self-join)
+// @access  Private
+router.post("/:id/join", protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+    const userName = req.user.name;
+
+    const chat = await Chat.findById(id);
+
+    if (!chat || !chat.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: 'Chat not found'
+      });
+    }
+
+    // Check if user is already a participant
+    if (chat.isParticipant(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'You are already a member of this chat',
+        data: chat
+      });
+    }
+
+    // Add current user as participant
+    chat.addParticipant(userId, userName, 'member');
+    await chat.save();
+    
+    // Populate the response
+    await chat.populate([
+      { path: 'participants.user', select: 'name email role' },
+      { path: 'createdBy', select: 'name email role' }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Successfully joined the chat!',
+      data: chat
+    });
+
+  } catch (error) {
+    console.error('Error joining chat:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to join chat',
+      error: error.message
+    });
+  }
+});
+
+// @route   POST /api/chats/:id/leave
+// @desc    Allow user to leave a chat
+// @access  Private
+router.post("/:id/leave", protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    const chat = await Chat.findById(id);
+
+    if (!chat || !chat.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: 'Chat not found'
+      });
+    }
+
+    // Check if user is a participant
+    if (!chat.isParticipant(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'You are not a member of this chat'
+      });
+    }
+
+    // Remove user from chat
+    chat.removeParticipant(userId);
+    await chat.save();
+    
+    // Populate the response
+    await chat.populate([
+      { path: 'participants.user', select: 'name email role' },
+      { path: 'createdBy', select: 'name email role' }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Successfully left the chat',
+      data: chat
+    });
+
+  } catch (error) {
+    console.error('Error leaving chat:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to leave chat',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
