@@ -446,4 +446,238 @@ router.post("/:id/leave", protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/chats/bulk-create
+// @desc    Create multiple groups at once (Admin only - Plus button functionality)
+// @access  Private (Admin only)
+router.post("/bulk-create", protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const userEmail = req.user.email;
+    const userRole = req.user.role;
+
+    // Check if user is admin
+    const isAdmin = userRole === 'admin' || userEmail === 'amjedvnml@gmail.com';
+    
+    if (!isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin access required. Only admins can bulk create groups.'
+      });
+    }
+
+    const { 
+      count = 1, 
+      namePrefix = 'Group', 
+      description = 'Auto-created group',
+      category = 'general',
+      type = 'group'
+    } = req.body;
+
+    // Validate count
+    if (count < 1 || count > 50) {
+      return res.status(400).json({
+        success: false,
+        message: 'Count must be between 1 and 50 groups'
+      });
+    }
+
+    const createdChats = [];
+    const errors = [];
+
+    // Create multiple groups
+    for (let i = 1; i <= count; i++) {
+      try {
+        const chatName = `${namePrefix} ${i}`;
+        
+        const newChat = new Chat({
+          name: chatName,
+          description: `${description} (${i}/${count})`,
+          type: type,
+          category: category,
+          createdBy: userId,
+          isAdminDM: false,
+          settings: {
+            allowFileSharing: true,
+            allowMediaSharing: true,
+            allowParticipantMessages: true,
+            isPublic: true,
+            requireApproval: false,
+            maxParticipants: 100
+          }
+        });
+
+        // Add admin as participant
+        newChat.addParticipant(userId, req.user.name, 'admin');
+        
+        await newChat.save();
+        
+        // Populate the response
+        await newChat.populate([
+          { path: 'participants.user', select: 'name email role' },
+          { path: 'createdBy', select: 'name email role' }
+        ]);
+
+        createdChats.push(newChat);
+        
+      } catch (chatError) {
+        errors.push({
+          chatNumber: i,
+          error: chatError.message
+        });
+      }
+    }
+
+    // Return results
+    const successCount = createdChats.length;
+    const errorCount = errors.length;
+
+    res.status(201).json({
+      success: true,
+      message: `Bulk creation completed: ${successCount} groups created successfully${errorCount > 0 ? `, ${errorCount} failed` : ''}`,
+      summary: {
+        requested: count,
+        successful: successCount,
+        failed: errorCount,
+        namePrefix: namePrefix
+      },
+      data: createdChats,
+      errors: errors.length > 0 ? errors : undefined
+    });
+
+  } catch (error) {
+    console.error('Error in bulk chat creation:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create groups in bulk',
+      error: error.message
+    });
+  }
+});
+
+// @route   POST /api/chats/quick-groups
+// @desc    Quick create predefined groups (Admin only - Plus button presets)
+// @access  Private (Admin only)
+router.post("/quick-groups", protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const userEmail = req.user.email;
+    const userRole = req.user.role;
+
+    // Check if user is admin
+    const isAdmin = userRole === 'admin' || userEmail === 'amjedvnml@gmail.com';
+    
+    if (!isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin access required. Only admins can create quick groups.'
+      });
+    }
+
+    const { preset = 'default' } = req.body;
+
+    // Define group presets
+    const groupPresets = {
+      default: [
+        { name: 'General Discussion', description: 'Main group for general conversations', category: 'general' },
+        { name: 'Announcements', description: 'Important updates and announcements', category: 'announcements' },
+        { name: 'Social Chat', description: 'Casual social conversations', category: 'social' }
+      ],
+      work: [
+        { name: 'Project Updates', description: 'Share project progress and updates', category: 'work' },
+        { name: 'Team Discussion', description: 'Team coordination and planning', category: 'work' },
+        { name: 'Support & Help', description: 'Get help and support from team', category: 'support' }
+      ],
+      event: [
+        { name: 'Event Planning', description: 'Plan and organize events', category: 'general' },
+        { name: 'Event Updates', description: 'Latest event information', category: 'announcements' },
+        { name: 'Event Social', description: 'Social chat for event participants', category: 'social' }
+      ],
+      community: [
+        { name: 'Welcome Newbies', description: 'Welcome new community members', category: 'general' },
+        { name: 'Community News', description: 'Latest community updates', category: 'announcements' },
+        { name: 'Help & Support', description: 'Community support and assistance', category: 'support' },
+        { name: 'Off Topic', description: 'Fun and casual conversations', category: 'social' }
+      ]
+    };
+
+    const selectedPreset = groupPresets[preset];
+    if (!selectedPreset) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid preset. Available presets: ${Object.keys(groupPresets).join(', ')}`
+      });
+    }
+
+    const createdChats = [];
+    const errors = [];
+
+    // Create groups from preset
+    for (let i = 0; i < selectedPreset.length; i++) {
+      try {
+        const groupData = selectedPreset[i];
+        
+        const newChat = new Chat({
+          name: groupData.name,
+          description: groupData.description,
+          type: 'group',
+          category: groupData.category,
+          createdBy: userId,
+          isAdminDM: false,
+          settings: {
+            allowFileSharing: true,
+            allowMediaSharing: true,
+            allowParticipantMessages: true,
+            isPublic: true,
+            requireApproval: false,
+            maxParticipants: 100
+          }
+        });
+
+        // Add admin as participant
+        newChat.addParticipant(userId, req.user.name, 'admin');
+        
+        await newChat.save();
+        
+        // Populate the response
+        await newChat.populate([
+          { path: 'participants.user', select: 'name email role' },
+          { path: 'createdBy', select: 'name email role' }
+        ]);
+
+        createdChats.push(newChat);
+        
+      } catch (chatError) {
+        errors.push({
+          groupName: selectedPreset[i].name,
+          error: chatError.message
+        });
+      }
+    }
+
+    const successCount = createdChats.length;
+    const errorCount = errors.length;
+
+    res.status(201).json({
+      success: true,
+      message: `Quick groups created: ${successCount} groups from '${preset}' preset${errorCount > 0 ? `, ${errorCount} failed` : ''}`,
+      preset: preset,
+      summary: {
+        preset: preset,
+        successful: successCount,
+        failed: errorCount
+      },
+      data: createdChats,
+      errors: errors.length > 0 ? errors : undefined
+    });
+
+  } catch (error) {
+    console.error('Error in quick group creation:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create quick groups',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
