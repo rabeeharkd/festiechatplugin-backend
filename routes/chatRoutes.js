@@ -39,24 +39,15 @@ const handleValidationErrors = (req, res, next) => {
 };
 
 // @route   GET /api/chats
-// @desc    Get user's chats with role-based filtering
+// @desc    Get all active chats - accessible to all logged-in users
 // @access  Private
 router.get("/", protect, async (req, res) => {
   try {
     const userId = req.user._id;
     const userRole = req.user.role;
-    const userEmail = req.user.email;
 
-    let chatQuery = { 
-      isActive: true,
-      'participants.user': userId,
-      'participants.isActive': true
-    };
-
-    // Admin sees all chats
-    if (userRole === 'admin' || userEmail === 'amjedvnml@gmail.com') {
-      chatQuery = { isActive: true }; // Admin sees all chats
-    }
+    // All logged-in users can see all active chats
+    const chatQuery = { isActive: true };
 
     const chats = await Chat.find(chatQuery)
       .populate('participants.user', 'name email role')
@@ -64,25 +55,12 @@ router.get("/", protect, async (req, res) => {
       .populate('lastMessage.sender', 'name email')
       .sort({ updatedAt: -1 });
 
-    // For regular users, filter to show only:
-    // 1. Group chats they participate in
-    // 2. Their own admin DM
-    let filteredChats = chats;
-    
-    if (userRole !== 'admin' && userEmail !== 'amjedvnml@gmail.com') {
-      filteredChats = chats.filter(chat => {
-        const isParticipant = chat.isParticipant(userId);
-        const isOwnAdminDM = chat.isAdminDM && isParticipant;
-        const isGroupChat = chat.type === 'group' || chat.type === 'channel';
-        return isParticipant && (isGroupChat || isOwnAdminDM);
-      });
-    }
-
     res.status(200).json({
       success: true,
-      count: filteredChats.length,
+      count: chats.length,
       userRole: userRole,
-      data: filteredChats
+      message: 'All chats accessible to logged-in users',
+      data: chats
     });
 
   } catch (error) {
@@ -186,14 +164,11 @@ router.post("/", protect, chatValidation, handleValidationErrors, async (req, re
 });
 
 // @route   GET /api/chats/:id
-// @desc    Get single chat
+// @desc    Get single chat - accessible to all logged-in users
 // @access  Private
 router.get("/:id", protect, async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
-    const userRole = req.user.role;
-    const userEmail = req.user.email;
 
     const chat = await Chat.findById(id)
       .populate('participants.user', 'name email role')
@@ -207,19 +182,10 @@ router.get("/:id", protect, async (req, res) => {
       });
     }
 
-    // Check access permissions
-    const isParticipant = chat.isParticipant(userId);
-    const isAdmin = userRole === 'admin' || userEmail === 'amjedvnml@gmail.com';
-
-    if (!isParticipant && !isAdmin) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied to this chat'
-      });
-    }
-
+    // All logged-in users can access any chat
     res.status(200).json({
       success: true,
+      message: 'Chat accessible to all logged-in users',
       data: chat
     });
 
@@ -251,17 +217,7 @@ router.put("/:id", protect, async (req, res) => {
       });
     }
 
-    // Check if user can update chat
-    const isSystemAdmin = req.user.role === 'admin' || req.user.email === 'amjedvnml@gmail.com';
-    const isChatAdmin = chat.isAdmin(userId);
-    const isChatCreator = chat.createdBy.toString() === userId.toString();
-
-    if (!isSystemAdmin && !isChatAdmin && !isChatCreator) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to update this chat'
-      });
-    }
+    // All logged-in users can update chats
 
     // Update fields
     if (name) chat.name = name;
@@ -308,16 +264,7 @@ router.delete("/:id", protect, async (req, res) => {
       });
     }
 
-    // Check if user can delete chat
-    const isSystemAdmin = req.user.role === 'admin' || req.user.email === 'amjedvnml@gmail.com';
-    const isChatCreator = chat.createdBy.toString() === userId.toString();
-
-    if (!isSystemAdmin && !isChatCreator) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to delete this chat'
-      });
-    }
+    // All logged-in users can delete chats
 
     // Soft delete
     chat.isActive = false;
@@ -356,16 +303,7 @@ router.post("/:id/participants", protect, async (req, res) => {
       });
     }
 
-    // Check permissions
-    const isSystemAdmin = req.user.role === 'admin' || req.user.email === 'amjedvnml@gmail.com';
-    const isChatAdmin = chat.isAdmin(userId);
-
-    if (!isSystemAdmin && !isChatAdmin) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to add participants'
-      });
-    }
+    // All logged-in users can add participants to chats
 
     // Check if user already exists
     if (chat.isParticipant(participantId)) {
